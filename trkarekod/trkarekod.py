@@ -1,5 +1,4 @@
 import json
-from operator import le
 from typing import Union
 from enum import Enum
 
@@ -9,7 +8,6 @@ class BicimGostergesi(str, Enum):
     BKM_KKF = "99"
     ATM_KKF = "98"
     FAST_KKF = "96"
-
 
 class UzunKarekod:
     """
@@ -64,17 +62,18 @@ def parse(payload: str) -> Union[ATMKarekod, KisaKarekod]:
     # 3. karekod'u class'ina parse et
     if not isinstance(payload, str):
         raise TypeError("Karekod payload'i string olmali")
-    match payload[:2]:
-        case BicimGostergesi.BKM_KKF.value:
-            pass
-        case BicimGostergesi.FAST_KKF.value:
-            pass
-        case BicimGostergesi.ATM_KKF.value:
-            if len(payload) < 7 or len(payload) > 220:  # hicbir value icermeyen payload
-                raise ValueError("Karekod uzunlugu gecersiz")
-            return ATMKarekod.from_string(payload)
-        case _:
-            raise TypeError("Bilinmeyen Biçim Göstergesi")
-
+    switch=SwitchBicimGostergesi()
+    return switch.bicimGostergesi(payload)
     
-    
+class SwitchBicimGostergesi:
+    def bicimGostergesi(self,payload:str)->Union[ATMKarekod, KisaKarekod]:
+        default="Bilinmeyen Biçim Göstergesi"
+        return getattr(self,'case_'+str(payload[:2]),lambda:default)(payload)
+    def case_99(self,payload:str):
+        return
+    def case_98(self,payload:str)-> 'ATMKarekod':
+        if len(payload) < 7 or len(payload) > 220:  # hicbir value icermeyen payload
+            raise ValueError("Karekod uzunlugu gecersiz")
+        return ATMKarekod.from_string(payload)
+    def case_96(self,payload:str):
+        return
