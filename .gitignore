@@ -3,3 +3,4 @@ venv
 .pytest_cache
 trkarekod.egg-info
 __pycache__
+build
