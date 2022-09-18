@@ -1,4 +1,5 @@
 import json
+from operator import le
 from typing import Union
 from enum import Enum
 
@@ -63,11 +64,17 @@ def parse(payload: str) -> Union[ATMKarekod, KisaKarekod]:
     # 3. karekod'u class'ina parse et
     if not isinstance(payload, str):
         raise TypeError("Karekod payload'i string olmali")
-    if payload[:2] == BicimGostergesi.BKM_KKF.value:
-        pass
-    elif payload[:2] == BicimGostergesi.FAST_KKF.value:
-        pass
-    elif payload[:2] == BicimGostergesi.ATM_KKF:
-        if len(payload) < 7 or len(payload) > 220:  # hicbir value icermeyen payload
-            raise ValueError("Karekod uzunlugu gecersiz")
-        return ATMKarekod.from_string(payload)
+    match payload[:2]:
+        case BicimGostergesi.BKM_KKF.value:
+            pass
+        case BicimGostergesi.FAST_KKF.value:
+            pass
+        case BicimGostergesi.ATM_KKF.value:
+            if len(payload) < 7 or len(payload) > 220:  # hicbir value icermeyen payload
+                raise ValueError("Karekod uzunlugu gecersiz")
+            return ATMKarekod.from_string(payload)
+        case _:
+            raise TypeError("Bilinmeyen Biçim Göstergesi")
+
+    
+    
